@@ -23,6 +23,4 @@
 ## Lincense
 This project uses a MIT lincense
 
-## Credit
 
-N/A
