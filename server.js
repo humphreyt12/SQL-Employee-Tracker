@@ -1,31 +1,37 @@
-// import inquirer 
-const inquirer = require('inquirer');
+//Import the required dependencies
+const inquirer = require('inquirer'); // import inquirer 
+const mysql = require('mysql2');// Import and require mysql2
+const cTable = require('console.table') //console.table
 
-// Import and require mysql2
-const mysql = require('mysql2');
+require('dotenv').config() //dotenv
 
-const PORT = process.env.PORT || 3001;
-
-require('dotenv').config()
+const PORT = process.env.PORT || 3001; //connecting to the PORT
 
 // Connect to database
-const db = mysql.createConnection(
-    {
-      host: 'localhost',
-      // MySQL username,
-      user: 'root',
-      // TODO: Add MySQL password here
-      password: process.env.DB_PASSWORD,
-      database: 'employee_db'
-    },
-    console.log(`Connected to the employee_db database.`),
-    console.log("***********************************"),
-    console.log("*                                 *"),
-    console.log("*        EMPLOYEE MANAGER         *"),
-    console.log("*                                 *"),
-    console.log("***********************************"),
-  ); 
+const connection = mysql.createConnection(
+  {
+    host: 'localhost',
+    user: 'root', // MySQL username,
+    password: process.env.DB_PASSWORD, //MySQL password
+    database: 'employee_db'
+  }); 
+  connection.connect(err => {
+    if (err) throw err;
+    console.log(`Connected to the employee_db database.`);
+    afterConnection();
+  });
 
+//function after connection is established and welcome image shows
+afterConnection = () => {
+  console.log("***********************************"),
+  console.log("*                                 *"),
+  console.log("*        EMPLOYEE MANAGER         *"),
+  console.log("*                                 *"),
+  console.log("***********************************"),
+  promptUser();
+ };
+
+const promptUser = () => {
 inquirer.prompt([
     {
       type: 'list',
@@ -98,10 +104,60 @@ inquirer.prompt([
       }
 
       if (choices === "No Action") {
-        return;
-    };
+        connection.end();
+      }
   });
+};
 
+// function to show all departments
+showDepartments = () => {
+  console.log('Showing all departments...\n');
+  const sql = 'SELECT department.id AS id, department.name AS department FROM department';
 
-// function to show all departments 
+  connection.promise().query(sql)
+    .then(([rows, fields]) => {
+      console.log("Rows:", rows); 
+      const departments = rows.map(row => ({ id: row.id, department: row.department }));
+      console.table(departments);
+      promptUser();
+    })
+    .catch((err) => {
+      console.error("Query error:", err); 
+      promptUser();
+    });
+};
+// simpler function to show all departments
+// showDepartments = () => {
+//   console.log('Showing all departments...\n');
+//   const sql = 'SELECT * FROM department'; // Use a simple SELECT * query
+
+//   connection.promise().query(sql)
+//     .then(([rows, fields]) => {
+//       console.log("Rows:", rows); // Add this line
+//       console.table(rows); // Display the entire result
+//       promptUser();
+//     })
+//     .catch((err) => {
+//       console.error("Query error:", err);
+//       promptUser();
+//     });
+// };
+
+//function to view all roles
+const showRoles = () => {
+  console.log('Showing all roles...\n');
+  const sql = `SELECT role.id, role.title, department.name AS department 
+               FROM role 
+               INNER JOIN department ON role.department_id = department.id`;
+  connection.promise().query(sql)
+    .then(([rows, fields]) => {
+      console.log("Rows:", rows); 
+      console.table(rows);
+      promptUser();
+    })
+    .catch((err) => {
+      console.error("Query error:", err); 
+      promptUser();
+    });
+};
 
