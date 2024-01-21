@@ -42,6 +42,8 @@ Walkthorugh video will be added soon
 
  npm install --save mysql2
 
+ npm install --save console.table
+
 ## Usage
 This application will allow users to view, add, and edit employees, roles, departments, and managers.
 
