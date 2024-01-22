@@ -381,20 +381,131 @@ const deleteEmployee = async (connection) => {
   }
 };
 
-// Call this function where needed in your application to delete employees
-// Example: deleteEmployee(connection);
-//Function to update an employee role
+// Function to update an employee's role
+const updateEmployee = async (connection) => {
+  try {
+    // Get employees for user selection
+    const [employeeRows] = await connection.query('SELECT * FROM employee');
+    const employees = employeeRows.map(row => ({ value: row.id, name: `${row.first_name} ${row.last_name}` }));
+
+    // Get roles for user selection
+    const [roleRows] = await connection.query('SELECT * FROM role');
+    const roles = roleRows.map(row => ({ value: row.id, name: row.title }));
+
+    // Prompt user for employee and role information
+    const employeeRoleDetails = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'employee',
+        message: "Select the employee to update:",
+        choices: employees
+      },
+      {
+        type: 'list',
+        name: 'role',
+        message: "Select the new role for the employee:",
+        choices: roles
+      }
+    ]);
+
+    const { employee, role } = employeeRoleDetails;
+
+    // Update the employee's role in the database
+    const updateSql = 'UPDATE employee SET role_id = ? WHERE id = ?';
+    await connection.query(updateSql, [role, employee]);
+
+    console.log("Employee role updated successfully.");
+
+    showEmployees(connection); // Display the updated list of employees
+  } catch (err) {
+    console.error("Error updating employee role:", err);
+
+    promptUser(connection); //Pass through the connection to promptUser function again
+  }
+};
+
+// Function to update an employee's manager
+const updateManager = async (connection) => {
+  try {
+    // Get employees for user selection
+    const [employeeRows] = await connection.query('SELECT * FROM employee');
+    const employees = employeeRows.map(row => ({ value: row.id, name: `${row.first_name} ${row.last_name}` }));
+
+    // Prompt user for employee and manager information
+    const employeeManagerDetails = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'employee',
+        message: "Select the employee to update:",
+        choices: employees
+      },
+      {
+        type: 'list',
+        name: 'manager',
+        message: "Select the new manager for the employee:",
+        choices: [...employees, { value: null, name: 'None' }] // Allow selecting no manager
+      }
+    ]);
+
+    const { employee, manager } = employeeManagerDetails;
+
+    // Update the employee's manager in the database
+    const updateSql = 'UPDATE employee SET manager_id = ? WHERE id = ?';
+    await connection.query(updateSql, [manager, employee]);
+
+    console.log("Employee manager updated successfully.");
+
+    showEmployees(connection); // Display the updated list of employees
+  } catch (err) {
+    console.error("Error updating employee manager:", err);
+
+    promptUser(connection); // Pass through the connection to promptUser function again
+  }
+};
+
+// Function to view employees by department
+const employeeDepartment = async (connection) => {
+  try {
+    // Get departments for user selection
+    const [deptRows] = await connection.query('SELECT * FROM department');
+    const departments = deptRows.map(row => ({ value: row.id, name: row.name }));
+
+    // Prompt user for department selection
+    const deptChoice = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'department',
+        message: "Select the department to view employees:",
+        choices: departments
+      }
+    ]);
+
+    const selectedDept = deptChoice.department;
+
+    // Query to retrieve employees in the selected department
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department
+                 FROM employee
+                 LEFT JOIN role ON employee.role_id = role.id
+                 LEFT JOIN department ON role.department_id = department.id
+                 WHERE department.id = ?`;
+
+    const [rows, fields] = await connection.query(sql, selectedDept);
+
+    console.log(`Showing employees in the '${deptChoice.department}' department...\n`);
+    console.table(rows);
+
+    promptUser(connection); // Pass the connection to the next function
+  } catch (err) {
+    console.error("Error viewing employees by department:", err);
+    promptUser(connection); // Handle errors and pass the connection to the next function
+  }
+};
 
 
 
-//Function to update an employee manager
 
 
 
-//Function to view employees by department
-
-
-
-// // Call promptUser to start the program
+// Call promptUser to start the program
 // promptUser();
 
