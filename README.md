@@ -7,10 +7,9 @@
  * [Installation](#Installation)
  * [Usage](#Usage)
  * [License](#License)
- * [Credit](#Credit)
 
 ## Description
- Built a command-line application from scratch to manage a company's employee database, using Node.js, Inquirer, and MySQL.
+ Built a command-line application from scratch to manage a company's employee database, using Node.js, Inquirer, MySQL, and Console Table.
 
  ## Criteria
 
@@ -45,9 +44,11 @@ Walkthorugh video will be added soon
  npm install --save console.table
 
 ## Usage
-This application will allow users to view, add, and edit employees, roles, departments, and managers.
+Run the following command to answer the prompted questions. The questions from the application will allow users to view, add, and edit employees, roles, departments, and managers. 
 
-## Lincense
-This project uses a MIT lincense
+npm start
+
+## License
+This project uses a MIT License
 
 
