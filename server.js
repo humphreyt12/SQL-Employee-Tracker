@@ -151,14 +151,14 @@ const addDepartment = (connection) => {
     }
   ])
     .then(answer => {
-      const sql = `INSERT INTO department (name)
-                  VALUES (?)`;
-      connection.query(sql, answer.addDept, (err, result) => {
-        if (err) throw err;
-        console.log('Added ' + answer.addDept + " to departments!"); 
-        showDepartments(connection);
-    });
-  });
+      const sql = `INSERT INTO department (name) VALUES (?)`;
+      return connection.query(sql, [answer.addDept]);
+  })
+  .then(response => {
+    console.log("Department was succesfully added");
+    promptUser(connection);
+  })
+  .catch((err) => console.log(err));
 };
 
 // Function to delete a department
@@ -500,11 +500,6 @@ const employeeDepartment = async (connection) => {
     promptUser(connection); // Handle errors and pass the connection to the next function
   }
 };
-
-
-
-
-
 
 // Call promptUser to start the program
 // promptUser();

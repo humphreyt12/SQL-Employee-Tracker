@@ -34,7 +34,8 @@ THEN I am prompted to select an employee to update and their new role and this i
 ```
 
 ## Video
-Walkthorugh video will be added soon
+Click link below to view a walkthrough of the application
+👉 https://vimeo.com/905436262/22ac897f89?share=copy
 
 ## Installation
  npm i inquirer@8.2.4
